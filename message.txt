@@ -1,0 +1,9 @@
+Hello ${username} and welcome to ${site_title}!
+
+If you are new to the Fediverse, check out https://fedi.tips/ for guides to get started.
+
+Totally lost?  Check out this video to help you orient yourself https://tilvids.com/w/wx2iLhD3pTipbKFJKLyx5t
+
+% if donation_link is not None:
+Please consider donating at ${donation_link} to help keep this site online!
+% endif
