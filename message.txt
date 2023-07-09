@@ -1,4 +1,4 @@
-Hello ${username} and welcome to ${site_title}!
+Hello @${username}@${domain} and welcome to ${site_title}!
 
 If you are new to the Fediverse, check out https://fedi.tips/ for guides to get started.
 

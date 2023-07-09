@@ -1,7 +1,6 @@
 blurhash==1.1.4
 certifi==2023.5.7
 charset-normalizer==3.2.0
-click==8.1.4
 decorator==5.1.1
 idna==3.4
 Mako==1.2.4
