@@ -3,7 +3,7 @@ FROM python:3.11-alpine AS builder
 COPY requirements.txt /
 RUN python -m venv /venv && \
     source /venv/bin/activate && \
-    pip install --require-virtualenv --no-compile --no-clean --no-cache-dir /requirements.txt
+    pip install --require-virtualenv --no-compile --no-clean --no-cache-dir -r /requirements.txt
 
 FROM python:3.11-alpine as service
 
