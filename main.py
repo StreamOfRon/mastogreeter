@@ -83,6 +83,7 @@ class Greeter:
                 [
                     x['id'] for x in first_page
                     if self.not_too_old(x['created_at'])
+                    and x['confirmed']
                 ]
             )
             self._log.debug(f"Now have {len(self._active_user_ids)} known active users")
