@@ -9,7 +9,7 @@ FROM python:3.11-alpine as service
 
 ENV PATH="/venv/bin:$PATH"
 COPY --from=builder /venv /
-COPY main.py template.txt /app/
+COPY main.py message.txt /app/
 
 ENTRYPOINT ["python"]
 CMD ["/app/main.py"]
