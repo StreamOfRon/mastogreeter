@@ -11,5 +11,6 @@ COPY main.py message.txt /app/
 
 ENV PATH="/venv/bin:$PATH"
 ENV PYTHONPATH="/venv"
+WORKDIR /app
 ENTRYPOINT ["python"]
 CMD ["/app/main.py"]
