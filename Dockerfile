@@ -8,6 +8,7 @@ RUN python -m venv /venv && \
 FROM python:3.11-alpine as service
 
 ENV PATH="/venv/bin:$PATH"
+ENV PYTHONPATH="/venv"
 COPY --from=builder /venv /
 COPY main.py message.txt /app/
 
