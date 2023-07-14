@@ -57,7 +57,7 @@ class Greeter:
                             if self.not_too_old(c['last_status']['created_at'])
                         ]
                     )
-                    if self.too_old(next_page[-1]['last_status']['created_at']):
+                    if len(next_page) < 1 or self.too_old(next_page[-1]['last_status']['created_at']):
                         break
                     else:
                         next_page = self._svc.fetch_next(next_page)
@@ -97,7 +97,7 @@ class Greeter:
                         ]
                     )
                     self._log.debug(f"Now have {len(self._active_user_ids)} known active users")
-                    if self.too_old(next_page[-1]['created_at']):
+                    if len(next_page) < 1 or self.too_old(next_page[-1]['created_at']):
                         break
                     else:
                         next_page = self._svc.fetch_next(next_page)
