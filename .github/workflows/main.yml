@@ -24,7 +24,7 @@ jobs:
             ghcr.io/streamofron/mastogreeter
           tags: |
             type=raw,value=latest,enable={{is_default_branch}}
-            type=sha,prefix=""
+            type=sha,prefix=,enable=true
       - name: 'Login to GitHub Container Registry'
         uses: docker/login-action@v2
         with:
