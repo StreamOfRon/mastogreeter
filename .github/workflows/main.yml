@@ -21,7 +21,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            streamofron/mastogreeter
+            ghcr.io/streamofron/mastogreeter
           tags: |
             type=sha
       - name: 'Login to GitHub Container Registry'
