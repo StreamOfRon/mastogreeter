@@ -2,9 +2,9 @@ import logging
 import os
 import sys
 from datetime import datetime
+from datetime import timezone
 
 import mastodon
-from dateutil.tz import tzutc
 from mako.template import Template
 from pythonjsonlogger import jsonlogger
 
@@ -28,7 +28,7 @@ class Greeter:
         self._max_days = int(os.getenv('MAX_ACCOUNT_AGE', 30))  # Maximum age of accounts in days which will be considered
         self._max_to_greet = int(os.getenv('MAX_GREETINGS_PER_RUN', 0))  # Limit how many greetings you'll send in a single run
         self._result_limit = int(os.getenv('API_RESULT_LIMIT', 200))  # The mastodon API seems to ignore values higher than this
-        self._utcnow = datetime.utcnow().replace(tzinfo=tzutc())
+        self._utcnow = datetime.now(tz=timezone.utc)
         self._tpl = Template(filename="message.txt")
         self._instance_data = None
         self._contacted_list_id_value = None
@@ -44,20 +44,20 @@ class Greeter:
                 [
                     acct['id'] for c in first_page
                     for acct in c['accounts']
-                    if self.not_too_old(c['last_status']['created_at'])
+                    if self.not_too_old(acct['created_at'])
                 ]
             )
             if len(first_page) > 0:
-                next_page = self._svc.fetch_next(first_page) if self.not_too_old(first_page[-1]['last_status']['created_at']) else None
+                next_page = self._svc.fetch_next(first_page) if self.not_too_old(self._get_last_status_age(first_page[-1])) else None
                 while next_page is not None:
                     self._contacted.update(
                         [
                             acct['id'] for c in next_page
                             for acct in c['accounts']
-                            if self.not_too_old(c['last_status']['created_at'])
+                            if self.not_too_old(acct['created_at'])
                         ]
                     )
-                    if len(next_page) < 1 or self.too_old(next_page[-1]['last_status']['created_at']):
+                    if len(next_page) < 1 or self.too_old(self._get_last_status_age(next_page[-1])):
                         break
                     else:
                         next_page = self._svc.fetch_next(next_page)
@@ -149,6 +149,13 @@ class Greeter:
         else:
             return globals()['log']
 
+    def _get_last_status_age(self, conversation):
+        if not [acct for acct in conversation.get('accounts') if acct.get('suspended', False)]:
+            try:
+                return conversation.get('last_status').get('created_at')
+            except AttributeError:
+                log.exception("Could not parse conversation {}".format(conversation))
+        return datetime.fromtimestamp(0, tz=timezone.utc)
 
 def main():
     greeter = Greeter()
