@@ -10,7 +10,7 @@ jobs:
     name: Delete old unused container images
     runs-on: ubuntu-latest
     steps:
-      - name: Delete 'dev' containers older than a week
+      - name: Delete old untagged container images
         uses: snok/container-retention-policy@v2
         with:
           image-names: mastogreeter
