@@ -28,6 +28,10 @@ class Greeter:
         self._max_days = int(os.getenv('MAX_ACCOUNT_AGE', 30))  # Maximum age of accounts in days which will be considered
         self._max_to_greet = int(os.getenv('MAX_GREETINGS_PER_RUN', 0))  # Limit how many greetings you'll send in a single run
         self._result_limit = int(os.getenv('API_RESULT_LIMIT', 200))  # The mastodon API seems to ignore values higher than this
+        self._skip_ids = [
+            intval for uid in os.getenv('SKIP_IDS', "").split(',')
+            if (intval := self._intval_or_none(uid)) is not None
+        ]
         self._utcnow = datetime.now(tz=timezone.utc)
         self._tpl = Template(filename="message.txt")
         self._instance_data = None
@@ -44,7 +48,7 @@ class Greeter:
                 [
                     acct['id'] for c in first_page
                     for acct in c['accounts']
-                    if self.not_too_old(acct['created_at'])
+                    if self.not_too_old(self._get_last_status_age(c))
                 ]
             )
             if len(first_page) > 0:
@@ -54,7 +58,7 @@ class Greeter:
                         [
                             acct['id'] for c in next_page
                             for acct in c['accounts']
-                            if self.not_too_old(acct['created_at'])
+                            if self.not_too_old(self._get_last_status_age(c))
                         ]
                     )
                     if len(next_page) < 1 or self.too_old(self._get_last_status_age(next_page[-1])):
@@ -105,7 +109,7 @@ class Greeter:
         return self._active_user_ids
 
     def get_users_to_greet(self):
-        return self.active_user_ids.difference(self.contacted)
+        return [id for id in self.active_user_ids.difference(self.contacted) if id not in self._skip_ids]
 
     def greet_users(self, user_ids):
         user_ids = sorted(user_ids)  # Always sort in ascending order so those who've waited the longest get greeted first
@@ -155,7 +159,13 @@ class Greeter:
                 return conversation.get('last_status').get('created_at')
             except AttributeError:
                 log.exception("Could not parse conversation {}".format(conversation))
-        return datetime.fromtimestamp(0, tz=timezone.utc)
+        return self._utcnow
+
+    def _intval_or_none(self, string):
+        try:
+            return int(string)
+        except ValueError:
+            return None
 
 def main():
     greeter = Greeter()
