@@ -18,6 +18,4 @@ jobs:
           account-type: personal
           keep-at-least: 3
           untagged-only: true
-          token: ${{ secrets.PAT }}
-          dry-run: true
-          
+          token: ${{ secrets.PAT }}          
